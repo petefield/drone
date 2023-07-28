@@ -1,0 +1,77 @@
+﻿@page "/"
+
+<PageTitle>Index</PageTitle>
+
+<h1>Hello, world!</h1>
+@using Microsoft.AspNetCore.SignalR.Client
+@using blazor.signalr.Shared;
+@inject NavigationManager Navigation
+
+
+<div class="slidecontainer">
+
+    <input type="range" min="-100" max="100" step="1" value="@vX" @oninput="@((args) => setvX(args.Value.ToString()))" />
+    <input type="range" min="-100" max="100" step="1" value="@vY" @oninput="@((args) => setvY(args.Value.ToString()))" />
+    <input type="range" min="-100" max="100" step="1" value="@vZ" @oninput="@((args) => setvZ(args.Value.ToString()))" />
+
+
+</div>
+
+<button @onclick="onKillclick">Kill</button>
+
+@code{
+
+    int vX; 
+    int vY; 
+    int vZ; 
+    int Yaw;
+
+
+
+    private HubConnection? hubConnection;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        hubConnection = new HubConnectionBuilder()
+            .WithUrl(Navigation.ToAbsoluteUri("/messagehub"))
+            .Build();
+
+        hubConnection.On<DroneState>("StatusChanged", droneState =>
+        {
+            vX = droneState.speed.X;
+            InvokeAsync(StateHasChanged);
+        });
+
+
+        await hubConnection.StartAsync();
+    }
+
+    public async Task setvX(string v)
+    {
+        vX = int.Parse(v);
+        await UpdateDroneState();
+    }
+
+    public async Task setvY(string v)
+    {
+        vY = int.Parse(v);
+        await UpdateDroneState();
+    }
+
+    public async Task setvZ(string v)
+    {
+        vZ = int.Parse(v);
+        await UpdateDroneState();
+    }
+
+    protected async Task onKillclick(){
+        await hubConnection.SendAsync("kill");
+    }
+
+    protected async Task UpdateDroneState()
+    {
+        await hubConnection.SendAsync("Update", new DroneCommands.RemoteCommand(new Speed(vX, vY, vZ), Yaw));
+    }
+
+}
