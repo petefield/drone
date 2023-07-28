@@ -25,20 +25,17 @@ namespace blazor.signalr.Server
 
         public void Start()
         {
-
             Console.WriteLine("START");
         }
 
         private void DroneStateChanged(object? sender, DroneStateChangedEventArgs e)
         {
-            _signalRController.Refresh(e.State);
+           // _signalRController.Refresh(e.State);
         }
 
         private void ControllerInputReceived(object? sender, ControllerEventArgs e)
         {
-            RemoteCommand remoteCommand = new RemoteCommand(new Shared.Speed(0, 0, 0), 0);
-
-            _drone.SetState(remoteCommand);
+            _drone.SetState(e.ControllerState);
         }
     }
 }
