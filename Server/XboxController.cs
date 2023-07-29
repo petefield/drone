@@ -56,16 +56,10 @@ namespace blazor.signalr.Server
                         default:
                             break;
                     }
-
-
-Console.WriteLine(e.Axis);
-
                     _command.Speed = speed;
 
                     Update();
                 };
-
-            
 
         }
 

@@ -30,7 +30,7 @@ namespace blazor.signalr.Server
 
         private void DroneStateChanged(object? sender, DroneStateChangedEventArgs e)
         {
-           // _signalRController.Refresh(e.State);
+           _signalRController.Refresh(e.State);
         }
 
         private void ControllerInputReceived(object? sender, ControllerEventArgs e)

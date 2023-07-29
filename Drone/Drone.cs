@@ -34,8 +34,8 @@ namespace Drone
         public void SetState(DroneCommands.RemoteCommand cmd)
         {
             Console.WriteLine($"x : {cmd.Speed.X} y : {cmd.Speed.Y} z : {cmd.Speed.Z} yaw : {cmd.Yaw} ");
+            notifyStateChange(new DroneState(0,0,cmd.Yaw, cmd.Speed,0,0,0,0,0,0, TimeSpan.FromMinutes(1), 0,0,0));
         }
-
 
         private void notifyStateChange(DroneState droneState)
         {

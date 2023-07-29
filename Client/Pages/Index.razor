@@ -8,22 +8,49 @@
 @inject NavigationManager Navigation
 
 
-<div class="slidecontainer">
+<div class="container-fluid">
 
-    <input type="range" min="-100" max="100" step="1" value="@vX" @oninput="@((args) => setvX(args.Value.ToString()))" />
-    <input type="range" min="-100" max="100" step="1" value="@vY" @oninput="@((args) => setvY(args.Value.ToString()))" />
-    <input type="range" min="-100" max="100" step="1" value="@vZ" @oninput="@((args) => setvZ(args.Value.ToString()))" />
+    <div class="row">
+
+        <div class="col-10">
+
+            <div class="row">
+
+                <div class="col">video</div>
+
+            </div>
+
+            <div class="row" style="position:fixed; bottom:0; ">
+
+                <div class="col">
+
+                    <input class="form-range" type="range" min="-100" max="100" step="1" value="@vX" />
+                    <input class="form-range" type="range" min="-100" max="100" step="1" value="@vY" />
+                    <input class="form-range" type="range" min="-100" max="100" step="1" value="@vZ" />
+                    <input class="form-range" type="range" min="-100" max="100" step="1" value="@Yaw" />
+                    <button @onclick="onKillclick">Kill</button>
+
+                </div>
+
+            </div>
 
 
+        </div>
+
+        <div class="col">
+            <h1>Telemetry</h1>
+
+        </div>
+    </div>
 </div>
 
-<button @onclick="onKillclick">Kill</button>
 
-@code{
 
-    int vX; 
-    int vY; 
-    int vZ; 
+@code {
+
+    int vX;
+    int vY;
+    int vZ;
     int Yaw;
 
 
@@ -34,12 +61,15 @@
     protected override async Task OnInitializedAsync()
     {
         hubConnection = new HubConnectionBuilder()
-            .WithUrl(Navigation.ToAbsoluteUri("/messagehub"))
-            .Build();
+        .WithUrl(Navigation.ToAbsoluteUri("/messagehub"))
+        .Build();
 
-        hubConnection.On<DroneState>("StatusChanged", droneState =>
+        hubConnection.On<DroneState>("refresh", droneState =>
         {
             vX = droneState.speed.X;
+            vY = droneState.speed.Y;
+            vZ = droneState.speed.Z;
+            Yaw = droneState.yaw;
             InvokeAsync(StateHasChanged);
         });
 
@@ -65,7 +95,8 @@
         await UpdateDroneState();
     }
 
-    protected async Task onKillclick(){
+    protected async Task onKillclick()
+    {
         await hubConnection.SendAsync("kill");
     }
 
